@@ -3,88 +3,153 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>StarMind Daily - 6x Auto Monitor</title>
+<meta name="theme-color" content="#0a0a0f">
+<title>StarMind Daily — Live Auto Monitor</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Inter,sans-serif}
-body{background:#0a0a0f;color:#fff;min-height:100vh;padding:16px}
-.card{background:linear-gradient(135deg,#1a1a2e,#16213e);border:1px solid #2a2a4a;border-radius:16px;padding:16px;margin-bottom:12px}
-.live{width:8px;height:8px;background:#00ff88;border-radius:50%;display:inline-block;animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
-.btn{display:flex;align-items:center;justify-content:space-between;padding:18px;border-radius:14px;text-decoration:none;color:#fff;font-weight:700;margin-bottom:10px;transition:0.2s}
-.btn-primary{background:linear-gradient(90deg,#6366f1,#8b5cf6);box-shadow:0 8px 24px rgba(99,102,241,.4)}
+:root{color-scheme:dark;--bg:#0a0a0f;--card:#151525;--line:#2a2a4a;--muted:#9292a7;--green:#00ff88;--red:#ff5263;--amber:#f59e0b;--blue:#6366f1}
+*{margin:0;padding:0;box-sizing:border-box;font-family:Inter,system-ui,sans-serif}
+body{background:var(--bg);color:#fff;min-height:100vh;padding:16px}
+main{max-width:560px;margin:auto}
+.card{background:linear-gradient(135deg,#1a1a2e,#16213e);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:12px}
+.live{width:8px;height:8px;background:var(--green);border-radius:50%;display:inline-block;animation:pulse 2s infinite;vertical-align:middle}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.small{font-size:11px;color:var(--muted);line-height:1.5}
+.muted{color:var(--muted)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.metric{font-weight:800;font-size:22px;margin:6px 0;overflow-wrap:anywhere}
+.btn{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px;border-radius:14px;text-decoration:none;color:#fff;font-weight:700;margin-bottom:10px;transition:.2s}
+.btn-primary{background:linear-gradient(90deg,#6366f1,#8b5cf6);box-shadow:0 8px 24px #6366f133}
 .btn-dark{background:#1e1e32;border:1px solid #333}
 .btn:hover{transform:translateY(-2px)}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
-.badge{font-size:10px;padding:3px 8px;border-radius:20px;background:#00ff8833;color:#00ff88;border:1px solid #00ff8855}
-.timeline{position:relative;padding-left:24px}
-.timeline::before{content:'';position:absolute;left:8px;top:0;bottom:0;width:2px;background:linear-gradient(to bottom,#00ff88,#6366f1,#333)}
-.dot{position:absolute;left:0;width:16px;height:16px;border-radius:50%;background:#0a0a0f;border:2px solid #00ff88;display:flex;align-items:center;justify-content:center;font-size:8px}
-.row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #1a1a2e}
-.small{font-size:11px;color:#888}
+.badge{font-size:10px;padding:3px 8px;border-radius:20px;white-space:nowrap;background:#00ff8822;color:var(--green);border:1px solid #00ff8855}
+.badge.fail{background:#ff526322;color:var(--red);border-color:#ff526355}
+.badge.wait{background:#f59e0b22;color:var(--amber);border-color:#f59e0b55}
+.section{font-size:11px;letter-spacing:1px;color:#777;margin:18px 0 8px}
+.row{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:11px 0;border-bottom:1px solid #24243a}
+.row:last-child{border-bottom:0}
+.row-main{min-width:0;flex:1}
+.row-title{font-size:12px;font-weight:600;overflow-wrap:anywhere}
+.status{font-size:10px;font-weight:700;white-space:nowrap}
+.status.success{color:var(--green)}.status.failure{color:var(--red)}.status.pending{color:var(--amber)}.status.neutral{color:#aaa}
+.bar{height:5px;background:#29293a;border-radius:10px;overflow:hidden;margin-top:9px}
+.bar>div{height:100%;width:0;background:linear-gradient(90deg,#6366f1,#00ff88);transition:width .3s}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.actions a{font-size:11px;color:#c7c7ff;text-decoration:none;border:1px solid #39395b;border-radius:8px;padding:8px 10px}
+#message{padding:10px 12px;border-radius:10px;background:#1c1c2d;margin-bottom:12px;font-size:12px;line-height:1.5}
+.error{color:#ff9aa4}.ok{color:var(--green)}
+.step{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:start;padding:10px 0;border-bottom:1px solid #24243a}
+.step:last-child{border-bottom:0}
+footer{text-align:center;margin:20px 0 8px}
+@media(max-width:380px){body{padding:10px}.grid{gap:7px}.card{padding:12px}.metric{font-size:19px}}
 </style>
 </head>
 <body>
-<div style="max-width:480px;margin:auto">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-    <div><div style="font-weight:800;font-size:20px">StarMind Daily <span class="live"></span> LIVE</div><div class="small">6x Auto Bot Monitor • No Login Needed</div></div>
-    <div style="font-size:11px;background:#1a1a2e;padding:6px 10px;border-radius:20px;border:1px solid #333">BST 19:22</div>
-  </div>
+<main>
+  <header style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:16px">
+    <div><div style="font-weight:800;font-size:20px">StarMind Daily <span class="live" id="liveDot"></span></div><div class="small">GitHub Actions • Live run & step monitor</div></div>
+    <div id="connection" class="badge wait">CONNECTING</div>
+  </header>
 
-  <div class="card" style="background:linear-gradient(135deg,#111827,#1f2937);border-color:#6366f144">
-    <div class="small" style="margin-bottom:6px">🔥 Ek click mai full monitoring — tension khatam!</div>
-    <div class="small">Bhai, yeh page kholo → sab status samne. Fail hua to red, success to green. GitHub actions, Telegram, triggers — sab ek jagah. Mobile pe bhi full kaam karega. Bina kisi login ke.</div>
+  <div id="message">Connecting to the public GitHub Actions API…</div>
+
+  <div class="grid">
+    <section class="card"><div class="small">LATEST WORKFLOW RUN</div><div class="metric" id="lastStatus">Loading…</div><div class="small" id="lastMeta">Fetching latest run</div><div class="bar"><div id="runBar"></div></div></section>
+    <section class="card"><div class="small">RUN DURATION</div><div class="metric" id="duration">—</div><div class="small" id="updated">Last checked: —</div><div class="small" style="margin-top:8px">Auto-refresh every 30 seconds</div></section>
   </div>
 
   <div class="grid">
-    <div class="card"><div class="small">LAST RUN</div><div style="font-weight:800;margin:6px 0">Success <span class="badge">22s</span></div><div class="small">8 mins ago • ID #1847</div><div style="height:4px;background:#222;border-radius:10px;margin-top:10px"><div style="width:100%;height:100%;background:#00ff88;border-radius:10px"></div></div></div>
-    <div class="card"><div class="small">NEXT RUNS</div><div style="font-weight:800;margin:6px 0">6 times today</div><div class="small">Peak hours: NY + London</div><div style="display:flex;gap:4px;margin-top:10px"><div style="flex:1;height:4px;background:#00ff88;border-radius:10px"></div><div style="flex:1;height:4px;background:#00ff88;border-radius:10px"></div><div style="flex:1;height:4px;background:#f59e0b;border-radius:10px"></div><div style="flex:1;height:4px;background:#333;border-radius:10px"></div></div></div>
+    <section class="card"><div class="small">RECENT RUNS</div><div class="metric" id="runCount">—</div><div class="small">Latest runs returned by GitHub</div></section>
+    <section class="card"><div class="small">LATEST RESULT</div><div class="metric" id="result">—</div><div class="small" id="branch">Branch: —</div></section>
   </div>
 
-  <div class="grid">
-    <div class="card"><div class="small">TODAY'S POSTS</div><div style="font-weight:800;font-size:22px;margin:6px 0">3 <span style="font-size:12px;color:#888">/6 Done</span></div><div style="height:6px;background:#222;border-radius:10px"><div style="width:50%;height:100%;background:linear-gradient(90deg,#6366f1,#8b5cf6);border-radius:10px"></div></div><div class="small" style="margin-top:6px;text-align:right">50%</div></div>
-    <div class="card" style="border-color:#00d4ff44"><div class="small" style="color:#00d4ff">CHANNEL</div><div style="font-weight:800;margin:6px 0">@StarMindDaily <span class="live"></span></div><div class="small">Live • 1.2k subs • Last: 2h ago</div></div>
-  </div>
-
-  <div style="font-size:11px;letter-spacing:1px;color:#666;margin:16px 0 8px">⚡ ONE-CLICK ACTIONS</div>
-  
-  <a class="btn btn-primary" href="https://github.com/HamzaXali/starmind-auto-bot/actions" target="_blank">
-    <div><div>👁️ View Live Workflow <span style="font-size:10px;background:#ffffff33;padding:2px 6px;border-radius:10px;margin-left:6px">PRIMARY</span></div><div class="small" style="color:#ddd">Ek click pe saare runs, logs, status — live</div></div>
-    <div>↗</div>
+  <div class="section">ONE-CLICK ACTIONS</div>
+  <a class="btn btn-primary" href="https://github.com/HamzaXali/starmind-auto-bot/actions" target="_blank" rel="noopener">
+    <div><div>👁️ Open Live Workflow Runs</div><div class="small" style="color:#e0e0ff">Full GitHub logs and workflow history</div></div><div>↗</div>
   </a>
-  
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-    <a class="btn btn-dark" href="https://t.me/StarMindDaily" target="_blank"><div><div style="font-size:13px">✈️ Check Telegram</div><div class="small">t.me/StarMindDaily</div></div><div>↗</div></a>
-    <a class="btn btn-dark" style="background:#1a1a0a;border-color:#f59e0b44" href="data:application/octet-stream;base64,bmFtZTogRGFpbHkgU3Rhck1pbmQgUG9zdAoKb246CiAgc2NoZWR1bGU6CiAgICAjIDE4OjAwIFVUQyA9IDE5OjAwIExvbmRvbiAoQlNUKSA9IDIzOjAwIFBha2lzdGFuID0gMTQ6MDAgVVNBIEVhc3QKICAgIC0gY3JvbjogJzAgMTggKiAqIConCiAgd29ya2Zsb3dfZGlzcGF0Y2g6ICMgTWFudWFsIHJ1biBidXR0b24KCmpvYnM6CiAgcG9zdDoKICAgIHJ1bnMtb246IHVidW50dS1sYXRlc3QKICAgIHN0ZXBzOgogICAgICAtIG5hbWU6IENoZWNrb3V0IHJlcG8KICAgICAgICB1c2VzOiBhY3Rpb25zL2NoZWNrb3V0QHY0CgogICAgICAtIG5hbWU6IFNldHVwIFB5dGhvbgogICAgICAgIHVzZXM6IGFjdGlvbnMvc2V0dXAtcHl0aG9uQHY1CiAgICAgICAgd2l0aDoKICAgICAgICAgIHB5dGhvbi12ZXJzaW9uOiAnMy4xMScKCiAgICAgIC0gbmFtZTogSW5zdGFsbCBkZXBzCiAgICAgICAgcnVuOiB8CiAgICAgICAgICBwaXAgaW5zdGFsbCByZXF1ZXN0cyBmZWVkcGFyc2VyCgogICAgICAtIG5hbWU6IFJ1biBhdXRvIGJvdAogICAgICAgIGVudjoKICAgICAgICAgIFRFTEVHUkFNX0JPVF9UT0tFTjogJHt7IHNlY3JldHMuVEVMRUdSQU1fQk9UX1RPS0VOIH19CiAgICAgICAgICBURUxFR1JBTV9DSEFOTkVMX0lEOiAke3sgc2VjcmV0cy5URUxFR1JBTV9DSEFOTkVMX0lEIH19CiAgICAgICAgcnVuOiB8CiAgICAgICAgICBweXRob24gbWFpbi5weQo=" target="_blank"><div><div style="font-size:13px">⚡ Trigger Now</div><div class="small">Manual run • 22s</div></div><div>↗</div></a>
+  <div class="grid">
+    <a class="btn btn-dark" href="https://t.me/StarMindDaily" target="_blank" rel="noopener"><div><div style="font-size:12px">✈️ Telegram Channel</div><div class="small">@StarMindDaily</div></div><div>↗</div></a>
+    <a class="btn btn-dark" href="https://github.com/HamzaXali/starmind-auto-bot/actions/workflows/daily-post.yml" target="_blank" rel="noopener"><div><div style="font-size:12px">⚡ Workflow Details</div><div class="small">Run workflow manually</div></div><div>↗</div></a>
   </div>
 
-  <div class="card" style="margin-top:16px">
-    <div style="display:flex;justify-content:space-between;margin-bottom:12px"><div style="font-weight:700;font-size:13px">🕒 Today's 6x Peak Schedule</div><div class="small" style="background:#222;padding:3px 8px;border-radius:10px">BST = London</div></div>
-    <div class="small" style="margin-bottom:12px">London + NY optimized • Full day cover</div>
-    
-    <div class="timeline">
-      <div class="row"><div class="dot" style="top:12px;background:#00ff88;color:#000">✓</div><div><div style="font-weight:600;font-size:13px">11 AM London</div><div class="small">6 AM NY</div></div><div class="small">Morning Brief</div><div class="badge">DONE</div></div>
-      <div class="row"><div class="dot" style="top:12px;background:#00ff88;color:#000">✓</div><div><div style="font-weight:600;font-size:13px">2 PM London</div><div class="small">9 AM NY</div></div><div class="small">NY Open</div><div class="badge">DONE</div></div>
-      <div class="row" style="background:#6366f111;border-radius:10px;padding:12px"><div class="dot" style="top:12px;background:#f59e0b;border-color:#f59e0b">◍</div><div><div style="font-weight:600;font-size:13px">5 PM London</div><div class="small">12 PM NY</div></div><div class="small">Lunch Hack</div><div class="badge" style="background:#f59e0b33;color:#f59e0b;border-color:#f59e0b55">NEXT</div></div>
-      <div class="row"><div class="dot" style="top:12px;background:#222"></div><div><div style="font-weight:600;font-size:13px">8 PM London</div><div class="small">3 PM NY</div></div><div class="small">Evening Deep</div><div class="small">SCHEDULED</div></div>
-      <div class="row"><div class="dot" style="top:12px;background:#222"></div><div><div style="font-weight:600;font-size:13px">11 PM London</div><div class="small">6 PM NY</div></div><div class="small">Late Drop</div><div class="small">SCHEDULED</div></div>
-      <div class="row" style="border:none"><div class="dot" style="top:12px;background:#222"></div><div><div style="font-weight:600;font-size:13px">2 AM London</div><div class="small">9 PM NY</div></div><div class="small">Daily Recap</div><div class="small">SCHEDULED</div></div>
-    </div>
-  </div>
+  <section class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:4px"><div style="font-weight:700;font-size:14px">🔄 Current Run — Action Steps</div><span id="stepCount" class="badge">WAITING</span></div>
+    <div class="small" id="currentRunTitle">No active run detected yet.</div>
+    <div class="bar"><div id="stepsBar"></div></div>
+    <div id="steps" style="margin-top:8px"><div class="small">Step statuses will appear here when GitHub reports a run.</div></div>
+  </section>
 
-  <div style="margin-top:20px;padding:12px;background:#0f172a;border-radius:12px;border:1px solid #1e293b">
-    <div style="font-weight:700;font-size:12px;margin-bottom:8px">📱 Bina Login Ke Kaise Use Karo?</div>
-    <div class="small" style="line-height:1.6">
-      <b>Ye wala page 100% bina login ke hai.</b> Isko GitHub pe host karo:<br>
-      1. Is file ko download karo (neeche link)<br>
-      2. GitHub repo me Add File → Upload → monitor.html<br>
-      3. Settings → Pages → Deploy from main branch ON karo<br>
-      4. Phir link ban jayega: hamzaxali.github.io/starmind-auto-bot/monitor.html<br><br>
-      Uspe koi login/signup nahi ayega, direct khulega. Isko home screen pe add kar do → ek tap me monitoring!
-    </div>
-  </div>
+  <section class="card">
+    <div style="font-weight:700;font-size:14px;margin-bottom:6px">🧾 Recent Workflow History</div>
+    <div class="small" style="margin-bottom:8px">Select a run to open its details and logs in GitHub.</div>
+    <div id="history"><div class="small">Loading workflow history…</div></div>
+  </section>
 
-  <div style="text-align:center;margin-top:20px" class="small">StarMind Daily • 6x Auto • No Login Monitor • Oct 2026</div>
-</div>
+  <section class="card" style="background:#0f172a;border-color:#1e293b">
+    <div style="font-weight:700;font-size:12px;margin-bottom:8px">ℹ️ What this dashboard can verify</div>
+    <div class="small">This page reads public GitHub Actions run and job data. It can show workflow status and individual step status while GitHub reports them. It does not invent post counts, subscriber counts, image quality, or Telegram delivery confirmation. Those details need the bot workflow to publish explicit results. GitHub may rate-limit anonymous API requests; use the workflow link if data temporarily fails.</div>
+  </section>
+  <footer class="small">StarMind Daily • Public monitor • <span id="footerTime">Waiting for first update</span></footer>
+</main>
+<script>
+const OWNER = "HamzaXali";
+const REPO = "starmind-auto-bot";
+const API = `https://api.github.com/repos/${OWNER}/${REPO}`;
+const WORKFLOW_HINT = "daily-post.yml";
+const REFRESH_MS = 30000;
+const $ = id => document.getElementById(id);
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function fmtDate(s){if(!s)return "—";const d=new Date(s);return isNaN(d)?"—":d.toLocaleString();}
+function age(start,end){if(!start)return "—";let ms=(new Date(end||Date.now())-new Date(start));if(!Number.isFinite(ms)||ms<0)return "—";let sec=Math.floor(ms/1000);return sec<60?sec+"s":sec<3600?Math.floor(sec/60)+"m "+sec%60+"s":Math.floor(sec/3600)+"h "+Math.floor(sec%3600/60)+"m";}
+function state(run){if(run.status==="in_progress")return ["IN PROGRESS","pending"];if(run.status==="queued"||run.status==="requested"||run.status==="waiting")return ["QUEUED","pending"];if(run.conclusion==="success")return ["SUCCESS","success"];if(run.conclusion==="failure")return ["FAILED","failure"];if(run.conclusion==="cancelled")return ["CANCELLED","failure"];if(run.conclusion==="skipped")return ["SKIPPED","neutral"];return [(run.conclusion||run.status||"UNKNOWN").replaceAll("_"," ").toUpperCase(),"neutral"];}
+async function getJSON(url){const r=await fetch(url,{headers:{"Accept":"application/vnd.github+json"}});if(!r.ok)throw new Error(`GitHub API returned ${r.status}${r.status===403?" (rate limit may have been reached)":""}`);return r.json();}
+function historyRow(run){const [label,cls]=state(run);return `<div class="row"><div class="row-main"><div class="row-title">${esc(run.name||run.display_title||"Workflow run")}</div><div class="small">#${run.run_number??"—"} · ${esc(fmtDate(run.created_at))}</div><div class="small">${esc(run.head_branch||"branch unknown")} · ${esc(age(run.created_at,run.updated_at))}</div></div><div style="text-align:right"><div class="status ${cls}">${esc(label)}</div><div style="margin-top:7px"><a href="${esc(run.html_url)}" target="_blank" rel="noopener" style="color:#b7b7ff;font-size:11px;text-decoration:none">Open ↗</a></div></div></div>`;}
+async function refresh(){
+  $("connection").textContent="UPDATING";
+  try{
+    const data=await getJSON(`${API}/actions/runs?per_page=12`);
+    const runs=data.workflow_runs||[];
+    if(!runs.length)throw new Error("No workflow runs were returned for this repository.");
+    const run=runs.find(r=>r.status==="in_progress")||runs.find(r=>r.status==="queued")||runs[0];
+    const [label,cls]=state(run);
+    $("connection").textContent="CONNECTED";$("connection").className="badge";
+    $("lastStatus").textContent=label;$("lastStatus").style.color=cls==="success"?"var(--green)":cls==="failure"?"var(--red)":cls==="pending"?"var(--amber)":"#fff";
+    $("lastMeta").textContent=`#${run.run_number??"—"} · Started ${fmtDate(run.run_started_at||run.created_at)}`;
+    $("duration").textContent=age(run.run_started_at||run.created_at,run.status==="completed"?run.updated_at:null);
+    $("updated").textContent="Last checked: "+new Date().toLocaleTimeString();
+    $("runBar").style.width=run.status==="completed"?(run.conclusion==="success"?"100%":"100%"):(run.status==="in_progress"?"65%":"12%");
+    $("runCount").textContent=String(data.total_count??runs.length);
+    $("result").textContent=run.conclusion?run.conclusion.toUpperCase():run.status.toUpperCase();
+    $("branch").textContent="Branch: "+(run.head_branch||"unknown");
+    $("currentRunTitle").textContent=`${run.name||run.display_title||"Workflow"} · #${run.run_number??"—"} · ${run.status.replaceAll("_"," ")}`;
+    $("history").innerHTML=runs.slice(0,8).map(historyRow).join("");
+    $("message").innerHTML=`<span class="${cls==="failure"?"error":cls==="success"?"ok":""}">● ${esc(label)}</span> — Latest relevant run: <a style="color:#c7c7ff" href="${esc(run.html_url)}" target="_blank" rel="noopener">open run #${run.run_number??"—"}</a>.`;
+    try{
+      const jobsData=await getJSON(`${API}/actions/runs/${run.id}/jobs?per_page=100`);
+      const jobs=jobsData.jobs||[];
+      const steps=jobs.flatMap(job=>(job.steps||[]).map(step=>({...step,jobName:job.name,jobStatus:job.status})));
+      const completed=steps.filter(s=>s.status==="completed").length;
+      const done=steps.length?Math.round(completed/steps.length*100):0;
+      $("stepsBar").style.width=done+"%";
+      $("stepCount").textContent=steps.length?`${completed}/${steps.length} DONE`:"NO STEPS";
+      $("steps").innerHTML=jobs.length?jobs.map(job=>{
+        const [jl,jc]=state({status:job.status,conclusion:job.conclusion});
+        const rows=(job.steps||[]).map(s=>{
+          const [sl,sc]=state({status:s.status,conclusion:s.conclusion});
+          const icon=sc==="success"?"✓":sc==="failure"?"✕":sc==="pending"?"◌":"•";
+          return `<div class="step"><div class="row-main"><div class="row-title">${icon} ${esc(s.name)}</div><div class="small">${s.started_at?"Started "+esc(fmtDate(s.started_at)):"Not started"}${s.completed_at?" · "+esc(age(s.started_at,s.completed_at)):""}</div></div><div class="status ${sc}">${esc(sl)}</div></div>`;
+        }).join("");
+        return `<div style="margin-top:12px"><div class="row-title">${esc(job.name)} <span class="status ${jc}">${esc(jl)}</span></div>${rows||'<div class="small">No step details available.</div>'}</div>`;
+      }).join(""):'<div class="small">No job details returned for this run.</div>';
+    }catch(e){$("steps").innerHTML=`<div class="small error">Could not load step details: ${esc(e.message)}</div>`;$("stepCount").textContent="API ERROR";}
+    $("footerTime").textContent="Updated "+new Date().toLocaleTimeString();
+  }catch(e){
+    $("connection").textContent="OFFLINE";$("connection").className="badge fail";
+    $("message").innerHTML=`<span class="error">Unable to load live GitHub status:</span> ${esc(e.message)}. Check your connection or open the GitHub Actions page directly.`;
+    $("footerTime").textContent="Last attempt "+new Date().toLocaleTimeString();
+  }
+}
+refresh();setInterval(refresh,REFRESH_MS);
+</script>
 </body>
 </html>
