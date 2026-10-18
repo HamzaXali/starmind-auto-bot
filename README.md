@@ -1,0 +1,1 @@
+# starmind-auto-bot
