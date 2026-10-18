@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>StarMind Daily - 6x Auto Monitor</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Inter,sans-serif}
+body{background:#0a0a0f;color:#fff;min-height:100vh;padding:16px}
+.card{background:linear-gradient(135deg,#1a1a2e,#16213e);border:1px solid #2a2a4a;border-radius:16px;padding:16px;margin-bottom:12px}
+.live{width:8px;height:8px;background:#00ff88;border-radius:50%;display:inline-block;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.btn{display:flex;align-items:center;justify-content:space-between;padding:18px;border-radius:14px;text-decoration:none;color:#fff;font-weight:700;margin-bottom:10px;transition:0.2s}
+.btn-primary{background:linear-gradient(90deg,#6366f1,#8b5cf6);box-shadow:0 8px 24px rgba(99,102,241,.4)}
+.btn-dark{background:#1e1e32;border:1px solid #333}
+.btn:hover{transform:translateY(-2px)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.badge{font-size:10px;padding:3px 8px;border-radius:20px;background:#00ff8833;color:#00ff88;border:1px solid #00ff8855}
+.timeline{position:relative;padding-left:24px}
+.timeline::before{content:'';position:absolute;left:8px;top:0;bottom:0;width:2px;background:linear-gradient(to bottom,#00ff88,#6366f1,#333)}
+.dot{position:absolute;left:0;width:16px;height:16px;border-radius:50%;background:#0a0a0f;border:2px solid #00ff88;display:flex;align-items:center;justify-content:center;font-size:8px}
+.row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #1a1a2e}
+.small{font-size:11px;color:#888}
+</style>
+</head>
+<body>
+<div style="max-width:480px;margin:auto">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+    <div><div style="font-weight:800;font-size:20px">StarMind Daily <span class="live"></span> LIVE</div><div class="small">6x Auto Bot Monitor • No Login Needed</div></div>
+    <div style="font-size:11px;background:#1a1a2e;padding:6px 10px;border-radius:20px;border:1px solid #333">BST 19:22</div>
+  </div>
+
+  <div class="card" style="background:linear-gradient(135deg,#111827,#1f2937);border-color:#6366f144">
+    <div class="small" style="margin-bottom:6px">🔥 Ek click mai full monitoring — tension khatam!</div>
+    <div class="small">Bhai, yeh page kholo → sab status samne. Fail hua to red, success to green. GitHub actions, Telegram, triggers — sab ek jagah. Mobile pe bhi full kaam karega. Bina kisi login ke.</div>
+  </div>
+
+  <div class="grid">
+    <div class="card"><div class="small">LAST RUN</div><div style="font-weight:800;margin:6px 0">Success <span class="badge">22s</span></div><div class="small">8 mins ago • ID #1847</div><div style="height:4px;background:#222;border-radius:10px;margin-top:10px"><div style="width:100%;height:100%;background:#00ff88;border-radius:10px"></div></div></div>
+    <div class="card"><div class="small">NEXT RUNS</div><div style="font-weight:800;margin:6px 0">6 times today</div><div class="small">Peak hours: NY + London</div><div style="display:flex;gap:4px;margin-top:10px"><div style="flex:1;height:4px;background:#00ff88;border-radius:10px"></div><div style="flex:1;height:4px;background:#00ff88;border-radius:10px"></div><div style="flex:1;height:4px;background:#f59e0b;border-radius:10px"></div><div style="flex:1;height:4px;background:#333;border-radius:10px"></div></div></div>
+  </div>
+
+  <div class="grid">
+    <div class="card"><div class="small">TODAY'S POSTS</div><div style="font-weight:800;font-size:22px;margin:6px 0">3 <span style="font-size:12px;color:#888">/6 Done</span></div><div style="height:6px;background:#222;border-radius:10px"><div style="width:50%;height:100%;background:linear-gradient(90deg,#6366f1,#8b5cf6);border-radius:10px"></div></div><div class="small" style="margin-top:6px;text-align:right">50%</div></div>
+    <div class="card" style="border-color:#00d4ff44"><div class="small" style="color:#00d4ff">CHANNEL</div><div style="font-weight:800;margin:6px 0">@StarMindDaily <span class="live"></span></div><div class="small">Live • 1.2k subs • Last: 2h ago</div></div>
+  </div>
+
+  <div style="font-size:11px;letter-spacing:1px;color:#666;margin:16px 0 8px">⚡ ONE-CLICK ACTIONS</div>
+  
+  <a class="btn btn-primary" href="https://github.com/HamzaXali/starmind-auto-bot/actions" target="_blank">
+    <div><div>👁️ View Live Workflow <span style="font-size:10px;background:#ffffff33;padding:2px 6px;border-radius:10px;margin-left:6px">PRIMARY</span></div><div class="small" style="color:#ddd">Ek click pe saare runs, logs, status — live</div></div>
+    <div>↗</div>
+  </a>
+  
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+    <a class="btn btn-dark" href="https://t.me/StarMindDaily" target="_blank"><div><div style="font-size:13px">✈️ Check Telegram</div><div class="small">t.me/StarMindDaily</div></div><div>↗</div></a>
+    <a class="btn btn-dark" style="background:#1a1a0a;border-color:#f59e0b44" href="data:application/octet-stream;base64,bmFtZTogRGFpbHkgU3Rhck1pbmQgUG9zdAoKb246CiAgc2NoZWR1bGU6CiAgICAjIDE4OjAwIFVUQyA9IDE5OjAwIExvbmRvbiAoQlNUKSA9IDIzOjAwIFBha2lzdGFuID0gMTQ6MDAgVVNBIEVhc3QKICAgIC0gY3JvbjogJzAgMTggKiAqIConCiAgd29ya2Zsb3dfZGlzcGF0Y2g6ICMgTWFudWFsIHJ1biBidXR0b24KCmpvYnM6CiAgcG9zdDoKICAgIHJ1bnMtb246IHVidW50dS1sYXRlc3QKICAgIHN0ZXBzOgogICAgICAtIG5hbWU6IENoZWNrb3V0IHJlcG8KICAgICAgICB1c2VzOiBhY3Rpb25zL2NoZWNrb3V0QHY0CgogICAgICAtIG5hbWU6IFNldHVwIFB5dGhvbgogICAgICAgIHVzZXM6IGFjdGlvbnMvc2V0dXAtcHl0aG9uQHY1CiAgICAgICAgd2l0aDoKICAgICAgICAgIHB5dGhvbi12ZXJzaW9uOiAnMy4xMScKCiAgICAgIC0gbmFtZTogSW5zdGFsbCBkZXBzCiAgICAgICAgcnVuOiB8CiAgICAgICAgICBwaXAgaW5zdGFsbCByZXF1ZXN0cyBmZWVkcGFyc2VyCgogICAgICAtIG5hbWU6IFJ1biBhdXRvIGJvdAogICAgICAgIGVudjoKICAgICAgICAgIFRFTEVHUkFNX0JPVF9UT0tFTjogJHt7IHNlY3JldHMuVEVMRUdSQU1fQk9UX1RPS0VOIH19CiAgICAgICAgICBURUxFR1JBTV9DSEFOTkVMX0lEOiAke3sgc2VjcmV0cy5URUxFR1JBTV9DSEFOTkVMX0lEIH19CiAgICAgICAgcnVuOiB8CiAgICAgICAgICBweXRob24gbWFpbi5weQo=" target="_blank"><div><div style="font-size:13px">⚡ Trigger Now</div><div class="small">Manual run • 22s</div></div><div>↗</div></a>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <div style="display:flex;justify-content:space-between;margin-bottom:12px"><div style="font-weight:700;font-size:13px">🕒 Today's 6x Peak Schedule</div><div class="small" style="background:#222;padding:3px 8px;border-radius:10px">BST = London</div></div>
+    <div class="small" style="margin-bottom:12px">London + NY optimized • Full day cover</div>
+    
+    <div class="timeline">
+      <div class="row"><div class="dot" style="top:12px;background:#00ff88;color:#000">✓</div><div><div style="font-weight:600;font-size:13px">11 AM London</div><div class="small">6 AM NY</div></div><div class="small">Morning Brief</div><div class="badge">DONE</div></div>
+      <div class="row"><div class="dot" style="top:12px;background:#00ff88;color:#000">✓</div><div><div style="font-weight:600;font-size:13px">2 PM London</div><div class="small">9 AM NY</div></div><div class="small">NY Open</div><div class="badge">DONE</div></div>
+      <div class="row" style="background:#6366f111;border-radius:10px;padding:12px"><div class="dot" style="top:12px;background:#f59e0b;border-color:#f59e0b">◍</div><div><div style="font-weight:600;font-size:13px">5 PM London</div><div class="small">12 PM NY</div></div><div class="small">Lunch Hack</div><div class="badge" style="background:#f59e0b33;color:#f59e0b;border-color:#f59e0b55">NEXT</div></div>
+      <div class="row"><div class="dot" style="top:12px;background:#222"></div><div><div style="font-weight:600;font-size:13px">8 PM London</div><div class="small">3 PM NY</div></div><div class="small">Evening Deep</div><div class="small">SCHEDULED</div></div>
+      <div class="row"><div class="dot" style="top:12px;background:#222"></div><div><div style="font-weight:600;font-size:13px">11 PM London</div><div class="small">6 PM NY</div></div><div class="small">Late Drop</div><div class="small">SCHEDULED</div></div>
+      <div class="row" style="border:none"><div class="dot" style="top:12px;background:#222"></div><div><div style="font-weight:600;font-size:13px">2 AM London</div><div class="small">9 PM NY</div></div><div class="small">Daily Recap</div><div class="small">SCHEDULED</div></div>
+    </div>
+  </div>
+
+  <div style="margin-top:20px;padding:12px;background:#0f172a;border-radius:12px;border:1px solid #1e293b">
+    <div style="font-weight:700;font-size:12px;margin-bottom:8px">📱 Bina Login Ke Kaise Use Karo?</div>
+    <div class="small" style="line-height:1.6">
+      <b>Ye wala page 100% bina login ke hai.</b> Isko GitHub pe host karo:<br>
+      1. Is file ko download karo (neeche link)<br>
+      2. GitHub repo me Add File → Upload → monitor.html<br>
+      3. Settings → Pages → Deploy from main branch ON karo<br>
+      4. Phir link ban jayega: hamzaxali.github.io/starmind-auto-bot/monitor.html<br><br>
+      Uspe koi login/signup nahi ayega, direct khulega. Isko home screen pe add kar do → ek tap me monitoring!
+    </div>
+  </div>
+
+  <div style="text-align:center;margin-top:20px" class="small">StarMind Daily • 6x Auto • No Login Monitor • Oct 2026</div>
+</div>
+</body>
+</html>
