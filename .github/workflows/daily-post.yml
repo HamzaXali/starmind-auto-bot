@@ -1,7 +1,8 @@
-name: StarMind Pro - 6 Daily Posts
+name: StarMind Growth Engine - 6 Daily Posts
 
 on:
   schedule:
+    # Six daily runs. GitHub may delay scheduled workflows during busy periods.
     - cron: "0 1,10,13,16,19,22 * * *"
   workflow_dispatch:
 
@@ -15,7 +16,7 @@ concurrency:
 jobs:
   post:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 8
 
     steps:
       - name: Checkout repository
@@ -33,20 +34,24 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt
 
-      - name: Run StarMind Pro Bot
+      - name: Run StarMind Growth Engine
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHANNEL_ID: ${{ secrets.TELEGRAM_CHANNEL_ID }}
+          TELEGRAM_CHANNEL_LINK: ${{ secrets.TELEGRAM_CHANNEL_LINK }}
         run: python main.py
 
-      - name: Save duplicate-prevention state
+      - name: Save article history and growth stats
+        if: always()
         run: |
-          if [ -f seen_articles.json ]; then
+          if [ -f seen_articles.json ] || [ -f growth_stats.json ]; then
             git config user.name "github-actions[bot]"
             git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add seen_articles.json
+            [ ! -f seen_articles.json ] || git add seen_articles.json
+            [ ! -f growth_stats.json ] || git add growth_stats.json
             if ! git diff --cached --quiet; then
-              git commit -m "Update seen articles state [skip ci]"
+              git commit -m "Update StarMind posting and growth stats [skip ci]"
               git push
             fi
           fi
+          
