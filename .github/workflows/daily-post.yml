@@ -1,31 +1,33 @@
-name: Daily StarMind Post
+name: Daily StarMind Post - 3x Peak Hours
 
 on:
   schedule:
-    # 18:00 UTC = 19:00 London (BST) = 23:00 Pakistan = 14:00 USA East
-    - cron: '0 18 * * *'
-  workflow_dispatch: # Manual run button
+    # 2 PM London = 9 AM New York - USA Morning Peak
+    - cron: '0 13 * * *'
+    # 6 PM London = 1 PM New York - USA Lunch + UK Evening Peak
+    - cron: '0 17 * * *'
+    # 10 PM London = 5 PM New York - USA Evening Peak (BEST for USA)
+    - cron: '0 21 * * *'
+  workflow_dispatch:
 
 jobs:
   post:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-
-      - name: Setup Python
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-
-      - name: Install deps
+      
+      - name: Install dependencies
         run: |
           pip install requests feedparser
-
-      - name: Run auto bot
+      
+      - name: Run Auto Post Bot
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHANNEL_ID: ${{ secrets.TELEGRAM_CHANNEL_ID }}
         run: |
           python main.py
-          
