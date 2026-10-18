@@ -317,8 +317,17 @@ def update_growth_stats():
         stats.pop(old_day, None)
 
     save_json(GROWTH_FILE, stats)
-    logging.info("Channel members: %s; today's change since first check: %s", count, count - int(previous_count))
-
+    if previous_count is None:
+    logging.info(
+        "Channel members: %s; today's change: unavailable (no previous count)",
+        count
+    )
+else:
+    logging.info(
+        "Channel members: %s; today's change since first check: %s",
+        count,
+        count - int(previous_count)
+    )
 
 def main():
     logging.info("StarMind Growth Engine started at %s", datetime.now(timezone.utc).isoformat())
