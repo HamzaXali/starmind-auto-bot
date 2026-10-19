@@ -1,0 +1,134 @@
+name: StarMind Shorts - 1 Daily Vertical Short
+
+on:
+  schedule:
+    # One Short per day at 14:00 UTC = 19:00 PKT / 15:00 London (BST)
+    # Adjust for your audience - US evening = UTC 22:00
+    - cron: '0 14 * * *'
+  workflow_dispatch:
+    inputs:
+      test_mode:
+        description: 'Test video generation (no YouTube upload)'
+        required: false
+        default: true
+        type: boolean
+      topic:
+        description: 'Force topic (tesla/spacex/ai_future/creators)'
+        required: false
+        default: ''
+        type: string
+
+concurrency:
+  group: starmind-shorts-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  build-shorts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install FFmpeg (required for Shorts)
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg
+          ffmpeg -version | head -n1
+          ffprobe -version | head -n1
+
+      - name: Install Python deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          # Use shorts requirements if exists, else fallback
+          if [ -f "requirements-shorts.txt" ]; then pip install -r requirements-shorts.txt; fi
+
+      - name: Validate secrets
+        env:
+          YOUTUBE_CLIENT_ID: ${{ secrets.YOUTUBE_CLIENT_ID }}
+          YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
+          YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN }}
+        run: |
+          if [ -z "$YOUTUBE_CLIENT_ID" ]; then
+            echo "::warning::YOUTUBE secrets missing - will generate artifact for manual upload (expected for first run)"
+          else
+            echo "YouTube creds present"
+          fi
+
+      - name: Generate Short (test mode)
+        if: ${{ inputs.test_mode == true || inputs.test_mode == '' }}
+        env:
+          YOUTUBE_CLIENT_ID: ${{ secrets.YOUTUBE_CLIENT_ID }}
+          YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
+          YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHANNEL_ID: ${{ secrets.TELEGRAM_CHANNEL_ID }}
+        run: |
+          python main.py --test 2>&1 | tee shorts.log
+          echo "Exit: ${PIPESTATUS[0]}"
+
+      - name: Generate & Upload Short (production)
+        if: ${{ inputs.test_mode == false }}
+        env:
+          YOUTUBE_CLIENT_ID: ${{ secrets.YOUTUBE_CLIENT_ID }}
+          YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
+          YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHANNEL_ID: ${{ secrets.TELEGRAM_CHANNEL_ID }}
+          TOPIC_OVERRIDE: ${{ inputs.topic }}
+        run: |
+          set -o pipefail
+          python main.py 2>&1 | tee shorts.log
+          EXIT_CODE=${PIPESTATUS[0]}
+          echo "Exit code: $EXIT_CODE"
+          if [ $EXIT_CODE -ne 0 ]; then
+            echo "::error::Shorts build failed with $EXIT_CODE"
+            exit $EXIT_CODE
+          fi
+
+      - name: Upload video artifact (for manual upload if auto-upload not configured)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: starmind-short-${{ github.run_number }}
+          path: |
+            output/*.mp4
+            output/*.srt
+            output/*.jpg
+            shorts.log
+            seen_articles.json
+            growth_stats.json
+          retention-days: 14
+          if-no-files-found: warn
+
+      - name: Commit seen history
+        if: ${{ success() && inputs.test_mode == false }}
+        run: |
+          git config user.name "starmind-shorts-bot"
+          git config user.email "shorts@starmind.daily"
+          git add seen_articles.json growth_stats.json || true
+          if git diff --staged --quiet; then
+            echo "No state changes"
+          else
+            git commit -m "Update Shorts history $(date -u +%Y-%m-%d) [skip ci]"
+            git push
+          fi
+
+      - name: Notify Telegram (optional)
+        if: ${{ success() && env.TELEGRAM_BOT_TOKEN != '' }}
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHANNEL_ID: ${{ secrets.TELEGRAM_CHANNEL_ID }}
+        run: |
+          # Send notification that Short is ready
+          echo "Telegram notification could be added here"
