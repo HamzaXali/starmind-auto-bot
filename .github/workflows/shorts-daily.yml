@@ -1,89 +1,97 @@
-name: StarMind Shorts + Telegram Auto-Post (NO SETTINGS NEEDED)
+name: StarMind Pro - 6 Daily Posts (FIXED)
 
 on:
   schedule:
-    - cron: '0 14 * * *'
+    - cron: '0 */4 * * *'  # Every 4 hours = 6 per day
   workflow_dispatch:
     inputs:
       test_mode:
-        description: 'Test only'
+        description: 'Test mode'
         required: false
-        default: false
+        default: true
         type: boolean
 
-# FIX 1: This line gives write permission WITHOUT needing Settings -> Actions -> General
-# You DON'T need to find Read and write setting anymore - this YAML overrides it
 permissions:
   contents: write
 
 concurrency:
-  group: starmind-shorts
+  group: starmind-pro
   cancel-in-progress: false
 
 jobs:
-  build-and-post:
+  post:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 5
     steps:
-      - name: Checkout with write token
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
-          persist-credentials: true
 
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - name: Install FFmpeg
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y ffmpeg
-
-      - name: Install deps
+      - name: Install dependencies
         run: |
           pip install -r requirements.txt
-          if [ -f "requirements-shorts.txt" ]; then pip install -r requirements-shorts.txt; fi
 
-      - name: Generate + Auto-Post to Telegram
+      - name: Validate secrets
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHANNEL_ID: ${{ secrets.TELEGRAM_CHANNEL_ID }}
+        run: |
+          if [ -z "$TELEGRAM_BOT_TOKEN" ]; then echo "::error::TELEGRAM_BOT_TOKEN missing"; exit 1; fi
+          if [ -z "$TELEGRAM_CHANNEL_ID" ]; then echo "::error::TELEGRAM_CHANNEL_ID missing"; exit 1; fi
+          echo "Secrets OK"
+
+      - name: Run StarMind bot (test mode)
+        if: ${{ inputs.test_mode == true }}
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHANNEL_ID: ${{ secrets.TELEGRAM_CHANNEL_ID }}
+        run: |
+          python main.py --test
+
+      - name: Run StarMind bot (publish)
         if: ${{ inputs.test_mode == false }}
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHANNEL_ID: ${{ secrets.TELEGRAM_CHANNEL_ID }}
         run: |
-          python main.py 2>&1 | tee shorts.log
+          set -o pipefail
+          python main.py 2>&1 | tee bot.log
           echo "Exit: ${PIPESTATUS[0]}"
+          # Don't fail on no new articles (exit 0)
+          if [ ${PIPESTATUS[0]} -eq 0 ] || [ ${PIPESTATUS[0]} -eq 10 ]; then
+            echo "Success or no new articles (handled)"
+            exit 0
+          else
+            exit ${PIPESTATUS[0]}
+          fi
 
-      - name: Generate (test)
-        if: ${{ inputs.test_mode == true }}
-        env:
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHANNEL_ID: ${{ secrets.TELEGRAM_CHANNEL_ID }}
-        run: python main.py --test 2>&1 | tee shorts.log
-
-      - name: Upload artifact
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: starmind-short-${{ github.run_number }}
-          path: |
-            output/*.mp4
-            shorts.log
-            seen_articles.json
-          retention-days: 14
-
-      - name: Commit history (FIXED - never fails workflow)
-        if: ${{ always() }}
-        continue-on-error: true  # Even if push fails, workflow stays green
+      - name: Commit updated state (only on success)
+        if: ${{ success() && inputs.test_mode == false }}
+        continue-on-error: true
         run: |
           git config user.name "starmind-bot"
           git config user.email "bot@starmind.daily"
-          git pull --rebase origin main || echo "Rebase skip"
-          git add seen_articles.json growth_stats.json 2>/dev/null || true
+          git pull --rebase origin main || true
+          git add seen_articles.json growth_stats.json || true
           if git diff --staged --quiet; then
-            echo "No changes"
+            echo "No state change"
           else
-            git commit -m "Update history $(date -u +%Y-%m-%d) [skip ci]" || true
-            git push origin main || echo "Push failed but workflow continues as success"
+            git commit -m "Update state $(date -u +%Y-%m-%dT%H:%M:%SZ) [skip ci]"
+            git push origin main || echo "Push failed but continuing"
           fi
+
+      - name: Upload logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: starmind-pro-logs-${{ github.run_number }}
+          path: |
+            bot.log
+            seen_articles.json
+            shorts.log
+          retention-days: 7
