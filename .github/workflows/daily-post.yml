@@ -38,7 +38,18 @@ jobs:
           cache: 'pip'
 
       - name: Install ffmpeg
-        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+        timeout-minutes: 8
+        run: |
+          if command -v ffmpeg >/dev/null 2>&1; then echo "ffmpeg already present"; exit 0; fi
+          for i in 1 2 3; do
+            if timeout 120 sudo apt-get update -o Acquire::Retries=3 && \
+               timeout 120 sudo apt-get install -y --no-install-recommends ffmpeg; then
+              break
+            fi
+            echo "ffmpeg install attempt $i failed or hung, retrying..."
+            sleep 10
+          done
+          command -v ffmpeg
 
       - name: Install dependencies
         run: |
